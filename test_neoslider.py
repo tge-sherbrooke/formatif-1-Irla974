@@ -1,32 +1,37 @@
 # /// script
 # requires-python = ">=3.9"
-# dependencies = ["adafruit-circuitpython-seesaw", "adafruit-blinka"]
+# dependencies = [
+#   "adafruit-circuitpython-seesaw",
+#   "adafruit-blinka",
+#   "rpi-gpio"
+# ]
 # ///
-"""Test du NeoSlider - Animation arc-en-ciel sur les LEDs."""
+
+"""
+Test du NeoSlider – animation arc-en-ciel
+"""
 
 import time
+import board
 from rainbowio import colorwheel
+from adafruit_seesaw.seesaw import Seesaw
+from adafruit_seesaw import neopixel
 
-try:
-    import board
-    from adafruit_seesaw.seesaw import Seesaw
-    from adafruit_seesaw import neopixel
+# Init I2C
+i2c = board.I2C()
 
-    i2c = board.I2C()
-    neoslider = Seesaw(i2c, 0x30)
-    pixels = neopixel.NeoPixel(neoslider, 14, 4, pixel_order=neopixel.GRB)
+# NeoSlider est à l'adresse 0x30 (PAS de keyword)
+neoslider = Seesaw(i2c, 0x30)
 
-except Exception:
-    class FakePixels:
-        def __init__(self, n):
-            self.n = n
+# 4 LEDs NeoPixel sur le pin 14
+pixels = neopixel.NeoPixel(
+    neoslider,
+    14,     # pin
+    4,      # nombre de LEDs
+    pixel_order=neopixel.GRB,
+    auto_write=True
+)
 
-        def fill(self, color):
-            print("LEDs:", [color] * self.n)
-
-    pixels = FakePixels(4)
-
-# Position dans la roue des couleurs
 color_pos = 0
 
 while True:
